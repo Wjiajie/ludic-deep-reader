@@ -1,0 +1,22 @@
+2026-02-08T14:52:05.114978Z  INFO ralph: Creating scratchpad directory: C:\Users\jiaji\Documents\github-project\ludic-deep-reader\.ralph/agent
+2026-02-08T14:52:05.115440Z  WARN ralph: Loop locking not supported on this platform, running without lock
+2026-02-08T14:52:05.246754Z  WARN ralph::loop_runner: Failed to record loop start in history: I/O error: File locking not supported on this platform
+2026-02-08T14:52:05.247341Z  INFO ralph_core::event_loop: Memory injection check: enabled=true, inject=Auto, workspace_root="C:\\Users\\jiaji\\Documents\\github-project\\ludic-deep-reader"
+2026-02-08T14:52:05.248504Z  INFO ralph_core::event_loop: Looking for memories at: "C:\\Users\\jiaji\\Documents\\github-project\\ludic-deep-reader\\.ralph/agent/memories.md" (exists: false)
+2026-02-08T14:52:05.248522Z  INFO ralph_core::event_loop: Successfully loaded 0 memories from store
+2026-02-08T14:52:05.248525Z  INFO ralph_core::event_loop: Memory store is empty - no memories to inject
+2026-02-08T14:57:05.588726Z  WARN ralph_adapters::cli_executor: Execution timeout reached, sending SIGTERM timeout_secs=300
+2026-02-08T14:57:05.651364Z  INFO ralph_core::event_loop: Memory injection check: enabled=true, inject=Auto, workspace_root="C:\\Users\\jiaji\\Documents\\github-project\\ludic-deep-reader"
+2026-02-08T14:57:05.651417Z  INFO ralph_core::event_loop: Looking for memories at: "C:\\Users\\jiaji\\Documents\\github-project\\ludic-deep-reader\\.ralph/agent/memories.md" (exists: false)
+2026-02-08T14:57:05.651435Z  INFO ralph_core::event_loop: Successfully loaded 0 memories from store
+2026-02-08T14:57:05.651439Z  INFO ralph_core::event_loop: Memory store is empty - no memories to inject
+2026-02-08T15:02:05.938306Z  WARN ralph_adapters::cli_executor: Execution timeout reached, sending SIGTERM timeout_secs=300
+2026-02-08T15:02:05.983930Z  INFO ralph_core::event_loop: Memory injection check: enabled=true, inject=Auto, workspace_root="C:\\Users\\jiaji\\Documents\\github-project\\ludic-deep-reader"
+2026-02-08T15:02:05.983977Z  INFO ralph_core::event_loop: Looking for memories at: "C:\\Users\\jiaji\\Documents\\github-project\\ludic-deep-reader\\.ralph/agent/memories.md" (exists: false)
+2026-02-08T15:02:05.983993Z  INFO ralph_core::event_loop: Successfully loaded 0 memories from store
+2026-02-08T15:02:05.983997Z  INFO ralph_core::event_loop: Memory store is empty - no memories to inject
+2026-02-08T15:07:06.330560Z  WARN ralph_adapters::cli_executor: Execution timeout reached, sending SIGTERM timeout_secs=300
+2026-02-08T15:07:06.386363Z  INFO ralph_core::event_loop: Memory injection check: enabled=true, inject=Auto, workspace_root="C:\\Users\\jiaji\\Documents\\github-project\\ludic-deep-reader"
+2026-02-08T15:07:06.386398Z  INFO ralph_core::event_loop: Looking for memories at: "C:\\Users\\jiaji\\Documents\\github-project\\ludic-deep-reader\\.ralph/agent/memories.md" (exists: false)
+2026-02-08T15:07:06.386408Z  INFO ralph_core::event_loop: Successfully loaded 0 memories from store
+2026-02-08T15:07:06.386411Z  INFO ralph_core::event_loop: Memory store is empty - no memories to inject
