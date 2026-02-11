@@ -1,0 +1,26 @@
+2026-02-08T15:13:53.114202Z  WARN ralph: Loop locking not supported on this platform, running without lock
+2026-02-08T15:13:53.232784Z  WARN ralph::loop_runner: Failed to record loop start in history: I/O error: File locking not supported on this platform
+2026-02-08T15:13:53.233040Z  INFO ralph_core::event_loop: Memory injection check: enabled=true, inject=Auto, workspace_root="C:\\Users\\jiaji\\Documents\\github-project\\ludic-deep-reader"
+2026-02-08T15:13:53.233068Z  INFO ralph_core::event_loop: Looking for memories at: "C:\\Users\\jiaji\\Documents\\github-project\\ludic-deep-reader\\.ralph/agent/memories.md" (exists: false)
+2026-02-08T15:13:53.233685Z  INFO ralph_core::event_loop: Successfully loaded 0 memories from store
+2026-02-08T15:13:53.233695Z  INFO ralph_core::event_loop: Memory store is empty - no memories to inject
+2026-02-08T15:18:53.588683Z  WARN ralph_adapters::cli_executor: Execution timeout reached, sending SIGTERM timeout_secs=300
+2026-02-08T15:18:53.673797Z  INFO ralph_core::event_loop: Memory injection check: enabled=true, inject=Auto, workspace_root="C:\\Users\\jiaji\\Documents\\github-project\\ludic-deep-reader"
+2026-02-08T15:18:53.673855Z  INFO ralph_core::event_loop: Looking for memories at: "C:\\Users\\jiaji\\Documents\\github-project\\ludic-deep-reader\\.ralph/agent/memories.md" (exists: false)
+2026-02-08T15:18:53.673874Z  INFO ralph_core::event_loop: Successfully loaded 0 memories from store
+2026-02-08T15:18:53.673879Z  INFO ralph_core::event_loop: Memory store is empty - no memories to inject
+2026-02-08T15:23:53.719048Z  INFO ralph_core::event_loop: Memory injection check: enabled=true, inject=Auto, workspace_root="C:\\Users\\jiaji\\Documents\\github-project\\ludic-deep-reader"
+2026-02-08T15:23:53.719099Z  INFO ralph_core::event_loop: Looking for memories at: "C:\\Users\\jiaji\\Documents\\github-project\\ludic-deep-reader\\.ralph/agent/memories.md" (exists: false)
+2026-02-08T15:23:53.719114Z  INFO ralph_core::event_loop: Successfully loaded 0 memories from store
+2026-02-08T15:23:53.719118Z  INFO ralph_core::event_loop: Memory store is empty - no memories to inject
+2026-02-08T15:28:05.590875Z  INFO ralph_core::event_loop: Completion event detected in JSONL topic=RESEARCH_COMPLETE
+2026-02-08T15:28:05.590963Z  INFO ralph_core::event_loop: Completion event detected - terminating
+2026-02-08T15:28:05.590973Z  INFO ralph::loop_runner: Completion event RESEARCH_COMPLETE detected.
+2026-02-08T15:28:05.590991Z  INFO ralph_core::event_loop: Wrapping up: completed. 3 iterations in 14m 12s. reason=completed iterations=3 duration=14m 12s
+2026-02-08T15:28:05.651059Z  WARN ralph::loop_runner: Failed to record completion in history: I/O error: File locking not supported on this platform
+2026-02-08T15:28:05.651116Z  INFO ralph_core::landing: Beginning landing sequence loop_id=primary
+2026-02-08T15:28:06.039753Z  INFO ralph_core::landing: Auto-committed changes during landing loop_id=primary commit=Some("2f4875391f38bd4d1c25f22b0838a4c7d8534164") files=22
+2026-02-08T15:28:11.078438Z  INFO ralph_core::landing: Generated handoff file loop_id=primary path=C:\Users\jiaji\Documents\github-project\ludic-deep-reader\.ralph\agent\handoff.md completed=0 open=0
+2026-02-08T15:28:11.219040Z  INFO ralph_core::loop_completion: Landing completed with auto-commit commit=Some("2f4875391f38bd4d1c25f22b0838a4c7d8534164") handoff=C:\Users\jiaji\Documents\github-project\ludic-deep-reader\.ralph\agent\handoff.md
+2026-02-08T15:28:11.219109Z  INFO ralph::loop_runner: Primary loop landed successfully committed=true handoff=C:\Users\jiaji\Documents\github-project\ludic-deep-reader\.ralph\agent\handoff.md open_tasks=0
+2026-02-08T15:28:11.219190Z  WARN ralph::loop_runner: Failed to deregister loop from registry: File locking not supported on this platform

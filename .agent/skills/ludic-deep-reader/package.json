@@ -1,0 +1,27 @@
+{
+  "name": "ludic-deep-reader",
+  "version": "1.0.0",
+  "description": "Gamified Deep Reading Agent Skill with MCP",
+  "main": "demo.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "demo": "node demo.js"
+  },
+  "keywords": [
+    "mcp",
+    "agent",
+    "reading",
+    "gamification"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "epub2md": "^1.5.0",
+    "fs-extra": "^11.2.0",
+    "@huggingface/transformers": "^3.0.0",
+    "vectra": "^0.0.4",
+    "better-sqlite3": "^9.4.0",
+    "uuid": "^9.0.0" 
+  }
+}
