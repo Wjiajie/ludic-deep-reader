@@ -18,3 +18,7 @@ Thumbs.db
 # OS Specific
 .vscode/
 .ralph/
+
+# Project Specific
+PROMPT.md
+ralph.yml
