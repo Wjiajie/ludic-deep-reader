@@ -22,7 +22,9 @@ export function initDatabase(dbPath) {
       chapters: [],
       game_states: [],
       inventory_terms: [],
-      inventory_propositions: []
+      inventory_propositions: [],
+      book_topics: [],       // 书籍主题标签
+      neutral_terms: []      // 中立术语（主题阅读用）
     });
   }
 
@@ -39,7 +41,9 @@ function _readDb(db) {
         chapters: [],
         game_states: [],
         inventory_terms: [],
-        inventory_propositions: []
+        inventory_propositions: [],
+        book_topics: [],
+        neutral_terms: []
       };
     }
     const content = fs.readFileSync(db.path, 'utf8');
@@ -50,10 +54,16 @@ function _readDb(db) {
         chapters: [],
         game_states: [],
         inventory_terms: [],
-        inventory_propositions: []
+        inventory_propositions: [],
+        book_topics: [],
+        neutral_terms: []
       };
     }
-    return JSON.parse(content);
+    const data = JSON.parse(content);
+    // Ensure new fields exist for older databases
+    if (!data.book_topics) data.book_topics = [];
+    if (!data.neutral_terms) data.neutral_terms = [];
+    return data;
   } catch (err) {
     console.error('Error reading DB:', err);
     throw err;
@@ -137,13 +147,18 @@ export function getChapter(db, bookId, chapterIndex) {
 
 // ============ Game State Operations ============
 
-export function saveGameState(db, bookId, state) {
+export function saveGameState(db, bookId, state, difficultyId = 'master') {
   const data = _readDb(db);
 
-  const existingIndex = data.game_states.findIndex(g => g.book_id === bookId);
+  // Create unique key based on book_id + difficulty for per-difficulty storage
+  const stateKey = `${bookId}_${difficultyId}`;
+
+  const existingIndex = data.game_states.findIndex(g => g.state_key === stateKey);
 
   const newState = {
+    state_key: stateKey,
     book_id: bookId,
+    difficulty_id: difficultyId,
     current_phase: state.currentPhase,
     current_chapter: state.currentChapter,
     xp_total: state.xpTotal,
@@ -167,9 +182,15 @@ export function saveGameState(db, bookId, state) {
   _writeDb(db, data);
 }
 
-export function getGameState(db, bookId) {
+export function getGameState(db, bookId, difficultyId = 'master') {
   const data = _readDb(db);
-  return data.game_states.find(g => g.book_id === bookId);
+  const stateKey = `${bookId}_${difficultyId}`;
+  return data.game_states.find(g => g.state_key === stateKey);
+}
+
+export function getAllGameStatesForBook(db, bookId) {
+  const data = _readDb(db);
+  return data.game_states.filter(g => g.book_id === bookId);
 }
 
 // ============ Inventory Operations ============
@@ -337,6 +358,118 @@ export function updateGameStateField(db, bookId, field, value) {
 }
 
 
+// ============ Book Topics (主题标签) CRUD ============
+
+/**
+ * Add a topic tag to a book
+ */
+export function addBookTopic(db, bookId, topic) {
+  const data = _readDb(db);
+  if (!data.book_topics) data.book_topics = [];
+
+  // Check if topic already exists for this book
+  const existing = data.book_topics.find(t => t.book_id === bookId && t.topic === topic);
+  if (existing) return existing.id;
+
+  const topicEntry = {
+    id: `topic_${Date.now()}`,
+    book_id: bookId,
+    topic,
+    created_at: new Date().toISOString()
+  };
+
+  data.book_topics.push(topicEntry);
+  _writeDb(db, data);
+  return topicEntry.id;
+}
+
+/**
+ * Get all topics for a book
+ */
+export function getBookTopics(db, bookId) {
+  const data = _readDb(db);
+  if (!data.book_topics) return [];
+  return data.book_topics.filter(t => t.book_id === bookId);
+}
+
+/**
+ * Get all books with a specific topic
+ */
+export function getBooksByTopic(db, topic) {
+  const data = _readDb(db);
+  if (!data.book_topics) return [];
+
+  const topicEntries = data.book_topics.filter(t => t.topic === topic);
+  const bookIds = [...new Set(topicEntries.map(t => t.book_id))];
+
+  // Get full book info
+  return bookIds.map(id => data.books.find(b => b.id === id)).filter(Boolean);
+}
+
+/**
+ * Get all topics with book counts
+ */
+export function getAllTopicsWithCounts(db) {
+  const data = _readDb(db);
+  if (!data.book_topics) return [];
+
+  const topicMap = {};
+  data.book_topics.forEach(t => {
+    if (!topicMap[t.topic]) {
+      topicMap[t.topic] = { topic: t.topic, bookCount: 0, bookIds: [] };
+    }
+    if (!topicMap[t.topic].bookIds.includes(t.book_id)) {
+      topicMap[t.topic].bookCount++;
+      topicMap[t.topic].bookIds.push(t.book_id);
+    }
+  });
+
+  return Object.values(topicMap).filter(t => t.bookCount >= 2);
+}
+
+// ============ Neutral Terms (中立术语) CRUD ============
+
+/**
+ * Add a neutral term for syntopical reading
+ */
+export function addNeutralTerm(db, topic, term) {
+  const data = _readDb(db);
+  if (!data.neutral_terms) data.neutral_terms = [];
+
+  const neutralTerm = {
+    id: term.id || `neutral_${Date.now()}`,
+    topic,
+    term: term.term,
+    definition: term.definition,
+    source_terms: term.sourceTerms || [],  // Array of {bookId, bookTitle, originalTerm}
+    created_at: new Date().toISOString()
+  };
+
+  data.neutral_terms.push(neutralTerm);
+  _writeDb(db, data);
+  return neutralTerm.id;
+}
+
+/**
+ * Get all neutral terms for a topic
+ */
+export function getNeutralTerms(db, topic) {
+  const data = _readDb(db);
+  if (!data.neutral_terms) return [];
+  return data.neutral_terms.filter(t => t.topic === topic);
+}
+
+/**
+ * Get all topics with neutral terms
+ */
+export function getTopicsWithNeutralTerms(db) {
+  const data = _readDb(db);
+  if (!data.neutral_terms) return [];
+
+  const topicSet = new Set(data.neutral_terms.map(t => t.topic));
+  return [...topicSet];
+}
+
 // ============ Aliases & Helpers ============
 
 export const addBook = insertBook;
@@ -347,7 +480,7 @@ export function addChapter(db, bookId, chapter) {
   insertChapters(db, bookId, [chapter]);
 }
 
-export function initializeGameState(db, bookId) {
+export function initializeGameState(db, bookId, difficultyId = 'master') {
   saveGameState(db, bookId, {
     currentPhase: 'SCOUTING',
     currentChapter: 1,
@@ -355,6 +488,127 @@ export function initializeGameState(db, bookId) {
     mana: 100,
     level: 1,
     activeQuest: null
+  }, difficultyId);
+}
+
+// ============ Milestone Cards CRUD ============
+
+export function addMilestoneCard(db, bookId, difficultyId, milestone) {
+  const data = _readDb(db);
+  if (!data.milestone_cards) data.milestone_cards = [];
+
+  data.milestone_cards.push({
+    id: milestone.id,
+    book_id: bookId,
+    difficulty_id: difficultyId,
+    phase: milestone.phase,
+    stats: milestone.stats,
+    created_at: milestone.timestamp
   });
+
+  _writeDb(db, data);
+}
+
+export function getMilestoneCards(db, bookId, difficultyId = null) {
+  const data = _readDb(db);
+  if (!data.milestone_cards) return [];
+
+  let cards = data.milestone_cards.filter(m => m.book_id === bookId);
+  if (difficultyId) cards = cards.filter(m => m.difficulty_id === difficultyId);
+  return cards.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+}
+
+// ============ Book Summary CRUD ============
+
+export function addBookSummary(db, bookId, difficultyId, summary) {
+  const data = _readDb(db);
+  if (!data.book_summaries) data.book_summaries = [];
+
+  data.book_summaries.push({
+    id: summary.id,
+    book_id: bookId,
+    difficulty_id: difficultyId,
+    summary_data: summary,
+    created_at: summary.timestamp
+  });
+
+  _writeDb(db, data);
+}
+
+export function getBookSummaries(db, bookId = null) {
+  const data = _readDb(db);
+  if (!data.book_summaries) return [];
+
+  let summaries = data.book_summaries;
+  if (bookId) summaries = summaries.filter(s => s.book_id === bookId);
+  return summaries.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+}
+
+// ============ Difficulty Migration (Switching Difficulty) ============
+
+/**
+ * Migrate game state from one difficulty to another
+ * Preserves progress but updates XP based on new difficulty multiplier
+ */
+export function migrateGameStateDifficulty(db, bookId, fromDifficultyId, toDifficultyId, state) {
+  const data = _readDb(db);
+
+  // Check if target difficulty state already exists
+  const targetKey = `${bookId}_${toDifficultyId}`;
+  const existingTarget = data.game_states.find(g => g.state_key === targetKey);
+
+  if (existingTarget) {
+    return {
+      success: false,
+      reason: 'Target difficulty game state already exists',
+      existingState: existingTarget
+    };
+  }
+
+  // Create new state for target difficulty
+  const newState = {
+    state_key: targetKey,
+    book_id: bookId,
+    difficulty_id: toDifficultyId,
+    current_phase: state.currentPhase,
+    current_chapter: state.currentChapter,
+    xp_total: state.xpTotal, // Keep same XP amount
+    mana: state.mana,
+    level: state.level,
+    active_quest_id: state.activeQuest,
+    last_updated: new Date().toISOString(),
+    migrated_from: fromDifficultyId,
+    migrated_at: new Date().toISOString()
+  };
+
+  data.game_states.push(newState);
+  _writeDb(db, data);
+
+  return {
+    success: true,
+    newState,
+    message: `Successfully migrated from ${fromDifficultyId} to ${toDifficultyId}`
+  };
+}
+
+/**
+ * Delete game state for a specific difficulty (used when reverting)
+ */
+export function deleteGameStateByDifficulty(db, bookId, difficultyId) {
+  const data = _readDb(db);
+  const stateKey = `${bookId}_${difficultyId}`;
+
+  const beforeCount = data.game_states.length;
+  data.game_states = data.game_states.filter(g => g.state_key !== stateKey);
+  const deleted = beforeCount !== data.game_states.length;
+
+  if (deleted) {
+    _writeDb(db, data);
+  }
+
+  return {
+    success: deleted,
+    deleted
+  };
 }
 
