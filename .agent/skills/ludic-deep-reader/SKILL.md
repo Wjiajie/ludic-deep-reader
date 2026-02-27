@@ -75,6 +75,17 @@ User must:
 
 ## 🎮 Game Mechanics
 
+### Difficulty Levels
+
+| Level | XP Multiplier | Mana Recovery | Hints | Requirements |
+|-------|---------------|---------------|-------|--------------|
+| **Beginner (初学者)** | 0.5x | 40 | ✅ | 3 terms, 2 props, 1 arg |
+| **Apprentice (学徒)** | 0.75x | 30 | ✅ | 4 terms, 3 props, 1 arg |
+| **Master (大师)** | 1.0x | 25 | ❌ | 5 terms, 3 props, 1 arg |
+| **Expert (专家)** | 1.5x | 20 | ❌ | 7 terms, 5 props, 2 args |
+
+**Difficulty Persistence**: Each difficulty level maintains a separate game state for each book. You can switch between difficulties anytime - your progress in each difficulty is preserved independently.
+
 ### XP Awards
 | Action | XP | Bonus |
 |--------|-----|-------|
@@ -91,10 +102,23 @@ User must:
 - **Wrong answer**: -10 Mana
 - **Rest break**: +30 Mana
 - **Zero Mana**: Force rest period
+- **Recovery**: Based on difficulty level (see table above)
 
 ### Dynamic Difficulty (DDA)
 - **3 failures**: Switch to EASY mode (hints + simpler quests)
 - **Success streak**: Switch to NORMAL mode + Combo multiplier
+
+### Milestone System
+- Complete each phase to earn a **Milestone Card**
+- Milestones include: XP gained, terms collected, propositions extracted, arguments built
+- milestones are saved per-book and per-difficulty
+- View all milestones with `show_milestones` command
+
+### Book Summaries
+- Complete a book to generate a **Book Summary Report**
+- Summary is saved as a local Markdown file in the `./summaries` directory
+- Includes: book info, final level, total XP, and phase-by-phase breakdown
+- Filename format: `{book_title}_{difficulty}_{date}_summary.md`
 
 ## 🔄 Workflow
 

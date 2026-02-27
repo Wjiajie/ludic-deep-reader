@@ -1,8 +1,11 @@
-
 import path from 'path';
 import fs from 'fs';
 import { parseEpub } from 'epub2md';
 import { randomUUID } from 'crypto';
+
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 /**
  * Process an EPUB file and extract its contents into per-chapter Markdown files.
@@ -44,11 +47,35 @@ export async function processEpub(epubPath, outputDir) {
     fs.mkdirSync(markdownDir, { recursive: true });
   }
 
+  // 4.5. Extract images
+  const assetsDir = path.join(markdownDir, 'assets');
+  const imageFiles = [];
+  try {
+    const manifest = epub.getManifest();
+    manifest.forEach(item => {
+      if (item.href && item.href.match(/\.(jpg|jpeg|png|gif|svg|webp)$/i)) {
+        try {
+          const buffer = epub.resolve(item.href).asNodeBuffer();
+          if (!fs.existsSync(assetsDir)) {
+            fs.mkdirSync(assetsDir, { recursive: true });
+          }
+          const basename = path.basename(item.href);
+          fs.writeFileSync(path.join(assetsDir, basename), buffer);
+          imageFiles.push({ href: item.href, basename });
+        } catch (e) {
+          console.warn(`Failed to extract image: ${item.href}`, e.message);
+        }
+      }
+    });
+  } catch (e) {
+    console.warn('Failed to parse epub manifest for images', e.message);
+  }
+
   // 5. Convert sections to Markdown and save chapter files
   const chapters = [];
   if (epub.sections && epub.sections.length > 0) {
     epub.sections.forEach((section, index) => {
-      const chapterData = sectionToMarkdown(section, index, epub.structure);
+      const chapterData = sectionToMarkdown(section, index, epub.structure, imageFiles);
       const filePath = saveChapter(chapterData, markdownDir);
       chapters.push({ ...chapterData, filePath });
     });
@@ -82,9 +109,10 @@ export function extractTOC(epub) {
  * @param {Section} section - EPUB section object (from epub2md)
  * @param {number} index - Chapter index
  * @param {Array} [structure] - Optional TOC structure for title lookup
+ * @param {Array} [imageFiles] - Optional array of extracted image paths
  * @returns {ChapterMarkdown} - Converted markdown with metadata
  */
-export function sectionToMarkdown(section, index, structure = []) {
+export function sectionToMarkdown(section, index, structure = [], imageFiles = []) {
   // Use epub2md's toMarkdown() method for conversion
   let content = '';
   try {
@@ -92,6 +120,17 @@ export function sectionToMarkdown(section, index, structure = []) {
   } catch (e) {
     // Fallback to raw HTML if markdown conversion fails
     content = section.htmlString || '';
+  }
+
+  // Rewrite image links
+  if (imageFiles && imageFiles.length > 0) {
+    imageFiles.forEach(img => {
+      const escapedBasename = escapeRegExp(img.basename);
+      // Replace markdown images: ![alt](path/to/img.jpg) -> ![alt](assets/img.jpg)
+      content = content.replace(new RegExp(`\\]\\([^)]*?${escapedBasename}\\)`, 'gi'), `](assets/${img.basename})`);
+      // Replace HTML images: <img src="path/to/img.jpg"> -> <img src="assets/img.jpg">
+      content = content.replace(new RegExp(`src="[^"]*?${escapedBasename}"`, 'gi'), `src="assets/${img.basename}"`);
+    });
   }
 
   // Try to find a title from the TOC structure

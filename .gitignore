@@ -14,12 +14,17 @@ yarn-debug.log*
 yarn-error.log*
 .DS_Store
 Thumbs.db
+AGENTS.md
 
 # OS Specific
 .vscode/
 .ralph/
+.claude/
+.memsearch/
 
 # Project Specific
 PROMPT.md
 ralph.yml
 .agent/skills/ludic-deep-reader/archive/
+
+ref/
